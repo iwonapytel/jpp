@@ -2,7 +2,7 @@ module RegExtra where
 import Mon
 import Reg
 import Data.List
--- It's not the final version!
+
 data AB = A | B deriving(Eq,Ord,Show)
 
 infix 4 ===
