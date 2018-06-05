@@ -1,5 +1,6 @@
 :- use_module(library(lists)).
 
+% znajdzWierzcholek 
 znajdzWierzcholek([Vertex | _], V, Vertex) :- Vertex = [V | _], !.
 znajdzWierzcholek([_ | T], V, Vertex) :- znajdzWierzcholek(T, V, Vertex).
 
@@ -8,7 +9,7 @@ wyborWierzcholka([V, e | N1], [V, e, N2])  :- member(N2, N1).
 wyborWierzcholka([V, a | N1], [V, a | N2]) :- permutation(N2, N1), !.
 
 % jestWyborem(+AEgraf, -Graf)
-jestWyborem(_, []).
+jestWyborem([], []).
 
 jestWyborem([V1 | T1], [V2 | T2]) :-
 	wyborWierzcholka(V1, V2), !,
@@ -17,7 +18,8 @@ jestWyborem([V1 | T1], [V2 | T2]) :-
 jestWyborem(AEgraf, [[V | N] | T]) :-
 	znajdzWierzcholek(AEgraf, V, Vertex),
 	wyborWierzcholka(Vertex, [V | N]),
-	jestWyborem(AEgraf, T).
+    delete(AEgraf, Vertex, _AEgraf),
+	jestWyborem(_AEgraf, T).
 
 
 % jestDFS(+Graf, -Lista)
@@ -32,8 +34,10 @@ doDFS(Graf, ZnajdzSasiadow, [S | Stos], Odwiedzone, Lista) :-
 	\+ member(S, Odwiedzone), !,
 	append(Odwiedzone, [S], _Odwiedzone),
 	call(ZnajdzSasiadow, Graf, S, Sasiedzi),
-	append(Sasiedzi, Stos, _Stos),
-        doDFS(Graf, ZnajdzSasiadow, _Stos, _Odwiedzone, Lista).
+    subtract(Sasiedzi, Odwiedzone, _Sasiedzi),
+    permutation(PermSasiadow, _Sasiedzi),
+	append(PermSasiadow, Stos, _Stos),
+    doDFS(Graf, ZnajdzSasiadow, _Stos, _Odwiedzone, Lista).
 
 doDFS(Graf, ZnajdzSasiadow, [S | Stos], Odwiedzone, Lista) :-
 	member(S, Odwiedzone),
@@ -49,7 +53,6 @@ znajdzSasiadowWybor(Graf, V, [N]) :-
 	member(N, Sasiedzi).
 
 % JestADFS(+AEgraf, -Lista)
-jestADFS([], []).
 jestADFS(AEgraf, Lista) :-
 	jestWyborem(AEgraf, Wybor),
 	jestDFS(Wybor, Lista).
